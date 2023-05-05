@@ -1,0 +1,32 @@
+---
+# tasks file for /home/ec2-user/ansible/roles/apache
+- name: run the db server
+  hosts: web_server_1
+  become: true
+  vars:
+    files:
+      - src: /home/ec2-user/ansible/kittens-carousel-nginx/myapp/index.html
+        dest: /usr/share/nginx/html
+      - src: /home/ec2-user/ansible/kittens-carousel-nginx/myapp/cat0.jpg
+        dest: /usr/share/nginx/html
+      - src: /home/ec2-user/ansible/kittens-carousel-nginx/myapp/cat1.jpg
+        dest: /usr/share/nginx/html
+      - src: /home/ec2-user/ansible/kittens-carousel-nginx/myapp/cat2.jpg
+        dest: /usr/share/nginx/html
+  tasks:
+    - name: install nginx
+      ansible.builtin.yum:
+        name: nginx
+        state: present
+
+    - name: start nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Copy files to folder
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop: "{{ files }}"

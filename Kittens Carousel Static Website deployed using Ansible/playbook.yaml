@@ -1,0 +1,32 @@
+---
+# tasks file for /home/ec2-user/ansible/roles/apache
+- name: run the db server
+  hosts: web_server_1
+  become: true
+  vars:
+    files:
+      - src: /home/ec2-user/ansible/kittens-carousel/myapp/index.html
+        dest: /var/www/html/
+      - src: /home/ec2-user/ansible/kittens-carousel/myapp/cat0.jpg
+        dest: /var/www/html/
+      - src: /home/ec2-user/ansible/kittens-carousel/myapp/cat1.jpg
+        dest: /var/www/html/
+      - src: /home/ec2-user/ansible/kittens-carousel/myapp/cat2.jpg
+        dest: /var/www/html/
+  tasks:
+    - name: installing apache
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+
+    - name: Copy files to folder
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      loop: "{{ files }}"
+
+    - name: restart apache2
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+        enabled: yes
